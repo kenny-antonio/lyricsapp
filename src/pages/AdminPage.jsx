@@ -30,12 +30,17 @@ export default function AdminPage() {
     setLoading(false)
   }
 
-  async function approveUser(userId) {
-    setProcessing(userId)
-    await supabase.from('profiles').update({ status: 'active' }).eq('id', userId)
-    await fetchAll()
-    setProcessing(null)
-  }
+ async function approveUser(userId) {
+   setProcessing(userId);
+   await supabase.rpc("approve_member", { member_id: userId });
+   await fetchAll();
+   setProcessing(null);
+ }
+
+ async function toggleMemberStatus(member) {
+   await supabase.rpc("suspend_member", { member_id: member.id });
+   await fetchAll();
+ }
 
   async function rejectUser(userId) {
     if (!confirm('Refuser et supprimer ce compte ?')) return
